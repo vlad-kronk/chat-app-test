@@ -3,8 +3,11 @@ var axios = require('axios');
 function harperSaveMessage(message, username, room) {
    const dbUrl = process.env.HARPERDB_URL;
    const dbPw = process.env.HARPERDB_PW;
+
+   // if we don't have auth
    if (!dbUrl || !dbPw) return null;
 
+   // set up post request JSON object
    var data = JSON.stringify({
       operation: 'insert',
       schema: 'realtime_chat_app',
@@ -18,6 +21,7 @@ function harperSaveMessage(message, username, room) {
       ],
    });
 
+   // set up axios fetch parameter
    var config = {
       method: 'post',
       url: dbUrl,
@@ -28,9 +32,11 @@ function harperSaveMessage(message, username, room) {
       data: data,
    };
 
+   // post request will take time, wrap in promise
    return new Promise((resolve, reject) => {
       axios(config)
          .then(function (response) {
+            // resolve promise with response data
             resolve(JSON.stringify(response.data));
          })
          .catch(function (error) {
