@@ -5,7 +5,9 @@ const Home = ({ username, setUsername, room, setRoom, socket }) => {
    const navigate = useNavigate();
 
    const joinRoom = () => {
+      // form fields require values
       if (room !== '' && username !== '') {
+         // tell the server that this client is joining the specified room
          socket.emit('join_room', { username, room });
       }
 

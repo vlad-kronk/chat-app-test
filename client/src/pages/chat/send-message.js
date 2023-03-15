@@ -5,11 +5,13 @@ const SendMessage = ({ socket, username, room }) => {
    const [message, setMessage] = useState('');
 
    const sendMessage = () => {
+      // require message to have text
       if (message !== '') {
          const __createdtime__ = Date.now();
-         // send message to server. can't specify who to send it to from frontend
-         // server will recieve message and then send it to all users in the room
+         // send message to server. can't specify who to send it to
+         // server will recieve message and then send it to all users in the room, including the sender
          socket.emit('send_message', { username, room, message, __createdtime__ });
+         // reset message textbox to be empty
          setMessage('');
       }
    };

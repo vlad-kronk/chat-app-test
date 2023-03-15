@@ -37,6 +37,7 @@ io.on('connection', (socket) => {
       const { username, room } = data;
       // join a user to a socket room
       socket.join(room);
+      console.log(`${username} has joined the the ${room} chat`)
 
       let __createdtime__ = Date.now();
 
@@ -99,7 +100,7 @@ io.on('connection', (socket) => {
          __createdtime__,
       });
 
-      console.log(`${username} has left the chat`);
+      console.log(`${username} has left the ${room} chat`);
    });
 
    socket.on('disconnect', () => {
