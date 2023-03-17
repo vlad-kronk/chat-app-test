@@ -2,22 +2,21 @@ require('dotenv').config();
 
 const express = require('express');
 const app = express();
-http = require('http');
+const http = require('http');
 const cors = require('cors');
-const { Server } = require('socket.io');
-
-const harperSaveMessage = require('./services/harper-save-message');
-const harperGetMessages = require('./services/harper-get-messages');
-const leaveRoom = require('./utils/leave-room');
+const socketio = require('socket.io');
 
 app.use(cors()); // use cors middleware
 
 const server = http.createServer(app);
 
+const SOCKETPORT = process.env.SOCKETPORT || 3000;
+const EXPRESSPORT = process.env.EXPRESSPORT || 4000;
+
 // create an io server and allow for CORS from http://localhost:3000 with GET and POST methods
-const io = new Server(server, {
+const io = new socketio.Server(server, {
    cors: {
-      origin: 'http://localhost:3000',
+      origin: SOCKETPORT,
       methods: ['GET', 'POST'],
    },
 });
@@ -25,8 +24,8 @@ const io = new Server(server, {
 
 const CHAT_BOT = 'ChatBot';
 
-let chatRoom = ''; // ex: javascript, node,...
-let allUsers = []; // array of all users in current chat room
+// let chatRoom = ''; // ex: javascript, node,...
+// let allUsers = []; // array of all users in current chat room
 
 // Listen for when the client connects via socket.io-client
 io.on('connection', (socket) => {
@@ -35,11 +34,12 @@ io.on('connection', (socket) => {
    socket.on('join_room', (data) => {
       // extrapolate data object into individual variables
       const { username, room } = data;
+
       // join a user to a socket room
       socket.join(room);
       console.log(`${username} has joined the the ${room} chat`)
 
-      let __createdtime__ = Date.now();
+      // let __createdtime__ = Date.now();
 
       // all clients in the room BESIDES the user's will recieve this message
       socket.to(room).emit('receive_message', {
@@ -55,19 +55,19 @@ io.on('connection', (socket) => {
          __createdtime__,
       });
 
-      chatRoom = room;
-      allUsers.push({ id: socket.id, username, room });
-      chatRoomUsers = allUsers.filter((user) => user.room === room);
-      socket.to(room).emit('chatroom_users', chatRoomUsers);
-      socket.emit('chatroom_users', chatRoomUsers);
+      // chatRoom = room;
+      // allUsers.push({ id: socket.id, username, room });
+      // chatRoomUsers = allUsers.filter((user) => user.room === room);
+      // socket.to(room).emit('chatroom_users', chatRoomUsers);
+      // socket.emit('chatroom_users', chatRoomUsers);
 
       // get last 100 messages from database, then
-      harperGetMessages(room)
-         .then((last100Messages) => {
-            // tell the user's client to display said messages
-            socket.emit('last_100_messages', last100Messages);
-         })
-         .catch((err) => console.log(err));
+      // harperGetMessages(room)
+      //    .then((last100Messages) => {
+      //       // tell the user's client to display said messages
+      //       socket.emit('last_100_messages', last100Messages);
+      //    })
+      //    .catch((err) => console.log(err));
    });
 
    socket.on('send_message', (data) => {
@@ -76,9 +76,9 @@ io.on('connection', (socket) => {
       // all clients in room, including sender, recieve the message
       io.in(room).emit('receive_message', data);
       // save message in database
-      harperSaveMessage(message, username, room, __createdtime__)
-         .then((response) => console.log(response))
-         .catch((err) => console.log(err));
+      // harperSaveMessage(message, username, room, __createdtime__)
+      //    .then((response) => console.log(response))
+      //    .catch((err) => console.log(err));
    });
 
    socket.on('leave_room', (data) => {
@@ -90,9 +90,9 @@ io.on('connection', (socket) => {
       const __createdtime__ = Date.now();
 
       // remove user of socket instance from the chatroom user list
-      allUsers = leaveRoom(socket.id, allUsers);
+      // allUsers = leaveRoom(socket.id, allUsers);
       // tell client to refresh chatroom user list with updated data
-      socket.to(room).emit('chatroom_users', allUsers);
+      // socket.to(room).emit('chatroom_users', allUsers);
       // all clients in the chatroom recieve a message that the user has left
       socket.to(room).emit('receive_message', {
          username: CHAT_BOT,
@@ -105,20 +105,11 @@ io.on('connection', (socket) => {
 
    socket.on('disconnect', () => {
       console.log('User disconnected from the chat');
-      const user = allUsers.find((user) => user.id == socket.id);
-      // ?. operator saves us from a runtime error if object property does not exist
-      // if the user doesnt have a username property, expression will return undefined
-      if (user?.username) {
-         // removes user from allUsers list
-         allUsers = leaveRoom(socket.id, allUsers);
-         // refresh client userlist for current chatroom
-         socket.to(chatRoom).emit('chatRoom_users', allUsers);
-         // all clients in chatroom recieve a message that the user has disconnected
-         socket.to(chatRoom).emit('recieve_message', {
-            message: `${user.username} has disconnected.`,
-         });
-      }
+      // const user = allUsers.find((user) => user.id == socket.id);
+      socket.to(chatRoom).emit('receive_message', {
+         message: `${user.username} has disconnected from the chat.`,
+      });
    });
 });
 
-server.listen(4000, () => 'Server is running on port 3000');
+server.listen(EXPRESSPORT, () => `Server is running on port ${SOCKETPORT}`);

@@ -1,23 +1,23 @@
 import styles from './styles.module.css';
-import { useState, useEffect } from 'react';
+
 import { useNavigate } from 'react-router-dom';
 
 const RoomAndUsers = ({ socket, username, room }) => {
-   const [roomUsers, setRoomUsers] = useState([]);
+   
 
    const navigate = useNavigate();
 
    // runs every time the component is rendered and whenever the socket object is modified
-   useEffect(() => {
-      //
-      socket.on('chatroom_users', (data) => {
-         console.log(data);
-         setRoomUsers(data);
-      });
+   // useEffect(() => {
+   //    //
+   //    socket.on('chatroom_users', (data) => {
+   //       console.log(data);
+   //       setRoomUsers(data);
+   //    });
 
-      // stop listening for chatroom_users event when the component is not being rendered in the client
-      return () => socket.off('chatroom_users');
-   }, [socket]);
+   //    // stop listening for chatroom_users event when the component is not being rendered in the client
+   //    return () => socket.off('chatroom_users');
+   // }, [socket]);
 
    const leaveRoom = () => {
       const __createdtime__ = Date.now();
@@ -31,8 +31,7 @@ const RoomAndUsers = ({ socket, username, room }) => {
       <div className={styles.roomAndUsersColumn}>
          <h2 className={styles.roomTitle}>{room}</h2>
 
-         <div>
-            {/* only renders component IF the user list contains at least one user */}
+         {/* <div>
             {roomUsers.length > 0 && <h5 className={styles.usersTitle}>Users:</h5>}
             <ul className={styles.usersList}>
                {roomUsers.map((user) => (
@@ -47,7 +46,7 @@ const RoomAndUsers = ({ socket, username, room }) => {
                   </li>
                ))}
             </ul>
-         </div>
+         </div> */}
 
          <button className='btn btn-outline' onClick={leaveRoom}>
             Leave

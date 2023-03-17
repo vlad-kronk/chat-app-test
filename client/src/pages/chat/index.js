@@ -4,12 +4,22 @@ import MessagesReceived from './messages';
 import SendMessage from './send-message';
 
 const Chat = ({ username, room, socket }) => {
+
+   // const localUserData = JSON.parse(localStorage.getItem('userData'));
+   // console.log(localUserData);
+
    return (
       <div className={styles.chatContainer}>
-         <RoomAndUsersColumn socket={socket} username={username} room={room} />
+         <RoomAndUsersColumn
+            socket={socket}
+            username={username}
+            room={room} />
          <div>
             <MessagesReceived socket={socket} />
-            <SendMessage socket={socket} username={username} room={room} />
+            <SendMessage
+               socket={socket}
+               username={username}
+               room={room} />
          </div>
       </div>
    );

@@ -6,7 +6,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import io from 'socket.io-client';
 
 // connect to SERVER port
-const socket = io.connect('http://localhost:4000');
+const socket = io.connect(`http://localhost:4000`);
 
 function App() {
   const [username, setUsername] = useState('');
@@ -30,7 +30,13 @@ function App() {
           />
           <Route
             path='/chat'
-            element={<Chat username={username} room={room} socket={socket} />}
+            element={
+              <Chat
+                username={username}
+                room={room}
+                socket={socket}
+              />
+            }
           />
         </Routes>
       </div>

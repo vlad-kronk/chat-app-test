@@ -27,17 +27,18 @@ const Messages = ({ socket }) => {
    }, [socket]);
 
    // runs whenever a socket event is recieved
-   useEffect(() => {
-      // fetches last 100 messages sent in chat room from the db
-      socket.on('last_100_messages', (last100Messages) => {
-         console.log('Last 100 messages:', JSON.parse(last100Messages));
-         // set variable to parsed data
-         last100Messages = JSON.parse(last100Messages);
-         // sort messages by __createdtime__
-         last100Messages = sortMessagesByDate(last100Messages);
-         setMessagesReceived((state) => [...last100Messages, ...state]);
-      });
-   }, [socket])
+   // useEffect(() => {
+   //    // Last 100 messages sent in the chat room (fetched from the db in backend)
+   //    socket.on('last_100_messages', (last100Messages) => {
+   //       console.log('Last 100 messages:', JSON.parse(last100Messages));
+   //       last100Messages = JSON.parse(last100Messages);
+   //       // Sort these messages by __createdtime__
+   //       last100Messages = sortMessagesByDate(last100Messages);
+   //       setMessagesReceived((state) => [...last100Messages, ...state]);
+   //    });
+
+   //    return () => socket.off('last_100_messages');
+   // }, [socket]);
 
    // scroll to most recent message whenever we get a new one
    useEffect(() => {
@@ -45,10 +46,10 @@ const Messages = ({ socket }) => {
    }, [messagesReceived]);
 
    // sorts messages by their date value from least to most recent
-   function sortMessagesByDate(messages) {
-      return messages
-         .sort((a, b) => parseInt(a.__createdtime__) - parseInt(b.__createdtime__));
-   }
+   // function sortMessagesByDate(messages) {
+   //    return messages
+   //       .sort((a, b) => parseInt(a.__createdtime__) - parseInt(b.__createdtime__));
+   // }
 
    // dd/mm/yyyy, hh:mm:ss
    function formatDateFromTimestamp(timestamp) {
